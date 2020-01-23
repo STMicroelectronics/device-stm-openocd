@@ -1,9 +1,8 @@
-From 2b5d1297ea6cf227755f89480b47136a85b438bf Mon Sep 17 00:00:00 2001
+From 08336fcf4cd88823355253dc41fefc00efe7e53c Mon Sep 17 00:00:00 2001
 From: Antonio Borneo <antonio.borneo@st.com>
 Date: Fri, 9 Nov 2018 11:26:47 +0100
-Subject: [PATCH 4/6] Fix init command
+Subject: [PATCH 4/7] Fix init command
 
-%% original patch: 0004-Fix-init-command.patch
 
 diff --git a/tcl/target/stm32mp15x_stpmic1.cfg b/tcl/target/stm32mp15x_stpmic1.cfg
 index a6446c6..2a32610 100644

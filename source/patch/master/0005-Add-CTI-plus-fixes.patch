@@ -1,9 +1,8 @@
-From d55fbac721f40cff459ada8d64f64ecbdd152c85 Mon Sep 17 00:00:00 2001
+From 23fec99f8e1e9aa884184c687220e3f335b1240d Mon Sep 17 00:00:00 2001
 From: Antonio Borneo <antonio.borneo@st.com>
 Date: Fri, 18 Jan 2019 16:52:07 +0100
-Subject: [PATCH 5/6] Add CTI plus fixes
+Subject: [PATCH 5/7] Add CTI plus fixes
 
-%% original patch: 0005-Add-CTI-plus-fixes.patch
 
 diff --git a/src/target/arm_cti.c b/src/target/arm_cti.c
 index dcaf21e..e6cb3cd 100644

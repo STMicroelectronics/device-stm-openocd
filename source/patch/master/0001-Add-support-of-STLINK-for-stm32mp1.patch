@@ -1,11 +1,9 @@
-From 113e84799d995bb466fc68759cb5a7808ce87939 Mon Sep 17 00:00:00 2001
+From 8a95f24103621531e56a541d0cbc2ed9ac7235f4 Mon Sep 17 00:00:00 2001
 From: Romuald JEANNE <romuald.jeanne@st.com>
 Date: Mon, 15 Oct 2018 17:40:36 +0200
-Subject: [PATCH 1/6] Add support of STLINK for stm32mp1
+Subject: [PATCH 1/7] Add support of STLINK for stm32mp1
 
 Signed-off-by: Romuald JEANNE <romuald.jeanne@st.com>
-
-%% original patch: 0001-Add-support-of-STLINK-for-stm32mp1.patch
 
 diff --git a/contrib/60-openocd.rules b/contrib/60-openocd.rules
 index 692e1b1..de47541 100644

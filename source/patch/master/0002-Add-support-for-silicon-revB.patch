@@ -1,9 +1,8 @@
-From e397f5d33a76dd5fa88cea4dc3a00f60eea93bb3 Mon Sep 17 00:00:00 2001
+From d2bb72978aa092726e413a9240a4b6e935bfb6e7 Mon Sep 17 00:00:00 2001
 From: Antonio Borneo <antonio.borneo@st.com>
 Date: Fri, 12 Oct 2018 11:49:18 +0200
-Subject: [PATCH 2/6] Add support for silicon revB
+Subject: [PATCH 2/7] Add support for silicon revB
 
-%% original patch: 0002-Add-support-for-silicon-revB.patch
 
 diff --git a/src/jtag/drivers/cmsis_dap_usb.c b/src/jtag/drivers/cmsis_dap_usb.c
 index 4ee4836..9e723b5 100644

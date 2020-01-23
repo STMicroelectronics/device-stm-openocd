@@ -1,10 +1,9 @@
-From cf8270ad968b2372313ba4f525a52e6597df8125 Mon Sep 17 00:00:00 2001
+From 7b110db6b09d4d3bf727e1d1424478667c9b2e4c Mon Sep 17 00:00:00 2001
 From: Antonio Borneo <antonio.borneo@st.com>
 Date: Fri, 9 Nov 2018 11:24:37 +0100
-Subject: [PATCH 3/6] Align to community code for cache coherency and reset
+Subject: [PATCH 3/7] Align to community code for cache coherency and reset
  framework
 
-%% original patch: 0003-Align-to-community-code-for-cache-coherency-and-rese.patch
 
 diff --git a/src/helper/startup.tcl b/src/helper/startup.tcl
 index 4ca2cab..2578de9 100644
