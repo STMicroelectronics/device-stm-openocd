@@ -19,11 +19,11 @@
 #######################################
 # Constants
 #######################################
-SCRIPT_VERSION="1.0"
+SCRIPT_VERSION="1.1"
 
 SOC_FAMILY="stm32mp1"
 SOC_NAME="stm32mp15"
-SOC_VERSION="stm32mp157c"
+SOC_VERSIONS=( "stm32mp157c" "stm32mp157f" )
 
 if [ -n "${ANDROID_BUILD_TOP+1}" ]; then
   TOP_PATH=${ANDROID_BUILD_TOP}
@@ -62,11 +62,6 @@ do_install=0
 do_onlyclean=0
 do_onlydistclean=0
 do_force=0
-
-do_all_board=1
-board_name=
-
-openocd_src=
 
 verbose="--silent"
 verbose_level=0
@@ -108,11 +103,11 @@ usage()
   echo "  This script allows building the OpenOCD source"
   empty_line
   echo "Options:"
-  echo "  -h/--help: print this message"
-  echo "  -i/--install: update prebuilt images"
-  echo "  -v/--version: get script version"
-  echo "  -f/--force: force Openocd Makefile rebuilt"
-  echo "  --verbose <level>: enable verbosity (1 or 2 depending on level of verbosity required)"
+  echo "  -h / --help: print this message"
+  echo "  -i / --install: update prebuilt images"
+  echo "  -v / --version: get script version"
+  echo "  -f / --force: force Openocd Makefile rebuild"
+  echo "  --verbose=<level>: enable verbosity (1 or 2 depending on level of verbosity required)"
   empty_line
   echo "Command: Optional, only one command at a time supported"
   echo "  clean: execute make clean on targeted module (remove only built objects)"
@@ -237,8 +232,10 @@ in_list()
 #######################################
 # Initialize number of states
 # Globals:
-#   I board_name
 #   I do_install
+#   I do_onlyclean
+#   I do_onlydistclean
+#   I openocd_src
 #   O nb_states
 # Arguments:
 #   None
@@ -313,15 +310,15 @@ generate_makefile()
 
   \pushd ${openocd_src} >/dev/null 2>&1
   # Call bootstrap script which create the configuration setup
-  ./bootstrap &>${redirect_out} || {
+  ./bootstrap nosubmodule &>${redirect_out} || {
     error "ERROR during bootstrap execution"
-	l_ret=1
+    l_ret=1
   }
 
   # Configure environment to be ready for building
   ./configure ${verbose} ${OPENOCD_CONFIGURE_OPTION} &>${redirect_out} || {
     error "ERROR during configure execution"
-	l_ret=1
+    l_ret=1
   }
   \popd >/dev/null 2>&1
 
@@ -407,51 +404,83 @@ if [[ "$0" != "$BASH_SOURCE" ]]; then
   return
 fi
 
-# Check the current usage
-if [ $# -gt 4 ]
-then
-  usage
+# check the options
+while getopts "hvif-:" option; do
+    case "${option}" in
+        -)
+            # Treat long options
+            case "${OPTARG}" in
+                help)
+                    usage
+                    \popd >/dev/null 2>&1
+                    exit 0
+                    ;;
+                version)
+                    echo "`basename $0` version ${SCRIPT_VERSION}"
+                    \popd >/dev/null 2>&1
+                    exit 0
+                    ;;
+                verbose=*)
+                    verbose_level=${OPTARG#*=}
+                    redirect_out="/dev/stdout"
+                    if ! in_list "0 1 2" "${verbose_level}"; then
+                        error "unknown verbose level ${verbose_level}"
+                        \popd >/dev/null 2>&1
+                        exit 1
+                    fi
+                    if [ ${verbose_level} == 2 ];then
+                        verbose=
+                    fi
+                    ;;
+                install)
+                    do_install=1
+                    ;;
+                force)
+                    do_force=1
+                    ;;
+                *)
+                    usage
+                    \popd >/dev/null 2>&1
+                    exit 1
+                    ;;
+            esac;;
+        # Treat short options
+        h)
+            usage
+            \popd >/dev/null 2>&1
+            exit 0
+            ;;
+        v)
+            echo "`basename $0` version ${SCRIPT_VERSION}"
+            \popd >/dev/null 2>&1
+            exit 0
+            ;;
+        i)
+            do_install=1
+            ;;
+        f)
+            do_force=1
+            ;;
+        *)
+            usage
+            \popd >/dev/null 2>&1
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+if [ $# -gt 1 ]; then
+  error "Only one command resquest support. Current commands are : $*"
   \popd >/dev/null 2>&1
   exit 1
 fi
 
-while test "$1" != ""; do
-  arg=$1
-  case $arg in
-    "-h"|"--help" )
-      usage
-      \popd >/dev/null 2>&1
-      exit 0
-      ;;
+# check the options
+if [ $# -eq 1 ]; then
 
-    "-v"|"--version" )
-      echo "`basename $0` version ${SCRIPT_VERSION}"
-      \popd >/dev/null 2>&1
-      exit 0
-      ;;
-
-    "-i"|"--install" )
-      do_install=1
-      ;;
-
-    "--verbose" )
-      verbose_level=${2}
-      redirect_out="/dev/stdout"
-      if ! in_list "0 1 2" "${verbose_level}"; then
-        error "unknown verbose level ${verbose_level}"
-        \popd >/dev/null 2>&1
-        exit 1
-      fi
-      if [ ${verbose_level} == 2 ];then
-        verbose=
-      fi
-      shift
-      ;;
-
-    "-f"|"--force" )
-      do_force=1
-      ;;
-
+  case $1 in
     "clean" )
       do_onlyclean=1
       ;;
@@ -459,15 +488,13 @@ while test "$1" != ""; do
     "distclean" )
       do_onlydistclean=1
       ;;
-
     ** )
       usage
       \popd >/dev/null 2>&1
       exit 0
       ;;
   esac
-  shift
-done
+fi
 
 # Check existence of the OPENOCD build configuration file
 if [[ ! -f ${OPENOCD_SOURCE_PATH}/${OPENOCD_BUILDCONFIG} ]]; then

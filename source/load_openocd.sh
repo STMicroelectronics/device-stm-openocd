@@ -19,11 +19,11 @@
 #######################################
 # Constants
 #######################################
-SCRIPT_VERSION="1.0"
+SCRIPT_VERSION="1.1"
 
 SOC_FAMILY="stm32mp1"
 SOC_NAME="stm32mp15"
-SOC_VERSION="stm32mp157c"
+SOC_VERSIONS=( "stm32mp157c" "stm32mp157f" )
 
 DEFAULT_OPENOCD_VERSION=0.10.0
 
@@ -38,12 +38,11 @@ fi
 
 \pushd ${TOP_PATH} >/dev/null 2>&1
 
-COMMON_PATH="${TOP_PATH}/device/stm/${SOC_FAMILY}"
 OPENOCD_PATH="${TOP_PATH}/device/stm/${SOC_FAMILY}-openocd"
-
-OPENOCD_PATCH_PATH="${OPENOCD_PATH}/source/patch"
+COMMON_PATH="${TOP_PATH}/device/stm/${SOC_FAMILY}"
 
 OPENOCD_CONFIG_FILE="android_openocd.config"
+OPENOCD_PATCH_PATH="${OPENOCD_PATH}/source/patch"
 
 OPENOCD_CONFIG_STATUS_PATH="${COMMON_PATH}/configs/openocd.config"
 
@@ -51,7 +50,7 @@ OPENOCD_CONFIG_STATUS_PATH="${COMMON_PATH}/configs/openocd.config"
 # Variables
 #######################################
 nb_states=2
-force_loading=0
+force_load=0
 
 optee_version=${DEFAULT_OPENOCD_VERSION}
 
@@ -91,9 +90,9 @@ usage()
   echo "  This script allows loading the OpenOCD source"
   empty_line
   echo "Options:"
-  echo "  -h/--help: print this message"
-  echo "  -v/--version: get script version"
-  echo "  -f/--force: force openocd load"
+  echo "  -h / --help: print this message"
+  echo "  -v / --version: get script version"
+  echo "  -f / --force: force openocd load"
   empty_line
 }
 
@@ -229,7 +228,9 @@ apply_patch()
   loc_patch_path=${OPENOCD_PATCH_PATH}/
   loc_patch_path+="${openocd_version}/"
   loc_patch_path+=$1
-  loc_patch_path+=".patch"
+  if [ "${1##*.}" != "patch" ];then
+    loc_patch_path+=".patch"
+  fi
 
   \git am ${loc_patch_path} &> /dev/null
   if [ $? -ne 0 ]; then
@@ -243,41 +244,71 @@ apply_patch()
 # Main
 #######################################
 
-# Check the current usage
-if [ $# -gt 2 ]
-then
+# Check that the current script is not sourced
+if [[ "$0" != "$BASH_SOURCE" ]]; then
+  empty_line
+  error "This script shall not be sourced"
+  empty_line
   usage
   \popd >/dev/null 2>&1
-  exit 0
+  return
 fi
 
-while test "$1" != ""; do
-  arg=$1
-  case $arg in
-    "-h"|"--help" )
+# check the options
+while getopts "hvf-:" option; do
+  case "${option}" in
+    -)
+      # Treat long options
+      case "${OPTARG}" in
+        help)
+          usage
+          popd >/dev/null 2>&1
+          exit 0
+          ;;
+        version)
+          echo "`basename $0` version ${SCRIPT_VERSION}"
+          \popd >/dev/null 2>&1
+          exit 0
+          ;;
+        force)
+          force_load=1
+          ;;
+        *)
+          usage
+          popd >/dev/null 2>&1
+          exit 1
+          ;;
+      esac;;
+    # Treat short options
+    h)
       usage
-      \popd >/dev/null 2>&1
+      popd >/dev/null 2>&1
       exit 0
       ;;
-
-    "-v"|"--version" )
+    v)
       echo "`basename $0` version ${SCRIPT_VERSION}"
       \popd >/dev/null 2>&1
       exit 0
       ;;
-
-    "-f"|"--force" )
-      force_loading=1
+    f)
+      force_load=1
       ;;
-
-    ** )
+    *)
       usage
-      \popd >/dev/null 2>&1
-      exit 0
+      popd >/dev/null 2>&1
+      exit 1
       ;;
   esac
-  shift
 done
+
+shift $((OPTIND-1))
+
+if [ $# -gt 0 ]; then
+  error "Unknown command : $*"
+  usage
+  popd >/dev/null 2>&1
+  exit 1
+fi
 
 OPENOCD_CONFIG_PATH=${OPENOCD_PATCH_PATH}/${OPENOCD_CONFIG_FILE}
 
@@ -293,7 +324,7 @@ fi
 check_openocd_status
 openocd_status=$?
 
-if [[ ${openocd_status} == 1 ]] && [[ ${force_loading} == 0 ]]; then
+if [[ ${openocd_status} == 1 ]] && [[ ${force_load} == 0 ]]; then
     blue "The OpenOCD has been already loaded successfully"
     echo " If you want to reload it"
     echo "   execute the script with -f/--force option"
@@ -368,7 +399,7 @@ while IFS='' read -r line || [[ -n $line ]]; do
         openocd_path=($(echo $line | awk '{ print $2 }'))
         msg_patch=0
         \rm -rf ${openocd_path}
-        if [[ ${force_loading} == 1 ]]; then
+        if [[ ${force_load} == 1 ]]; then
           \rm -f ${OPENOCD_CONFIG_STATUS_PATH}
         fi
         ;;
