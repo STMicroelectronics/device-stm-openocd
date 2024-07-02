@@ -21,9 +21,9 @@
 #######################################
 SCRIPT_VERSION="1.1"
 
-SOC_FAMILY="stm32mp1"
-SOC_NAME="stm32mp15"
-SOC_VERSIONS=( "stm32mp157c" "stm32mp157f" )
+SOC_FAMILY="stm32mp2"
+SOC_NAME="stm32mp25"
+SOC_VERSIONS=( "stm32mp257f" )
 
 if [ -n "${ANDROID_BUILD_TOP+1}" ]; then
   TOP_PATH=${ANDROID_BUILD_TOP}

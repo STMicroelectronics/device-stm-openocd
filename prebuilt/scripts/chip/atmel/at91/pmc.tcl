@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 if [info exists AT91C_MAINOSC_FREQ] {
     # user set this... let it be.
@@ -14,4 +15,3 @@ if [info exists AT91C_SLOWOSC_FREQ] {
     set AT91C_SLOWOSC_FREQ 32768
 }
 global AT91C_SLOWOSC_FREQ
-

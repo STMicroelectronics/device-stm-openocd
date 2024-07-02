@@ -21,11 +21,11 @@
 #######################################
 SCRIPT_VERSION="1.1"
 
-SOC_FAMILY="stm32mp1"
-SOC_NAME="stm32mp15"
-SOC_VERSIONS=( "stm32mp157c" "stm32mp157f" )
+SOC_FAMILY="stm32mp2"
+SOC_NAME="stm32mp25"
+SOC_VERSIONS=("stm32mp257f")
 
-DEFAULT_OPENOCD_VERSION=0.10.0
+DEFAULT_OPENOCD_VERSION=0.12.0
 
 if [ -n "${ANDROID_BUILD_TOP+1}" ]; then
   TOP_PATH=${ANDROID_BUILD_TOP}
@@ -356,9 +356,9 @@ while IFS='' read -r line || [[ -n $line ]]; do
         git_path=($(echo $line | awk '{ print $2 }'))
         state "Loading OpenOCD source"
         if [ -n "${OPENOCD_CACHE_DIR+1}" ]; then
-          \git clone -b ${openocd_version} --reference ${OPENOCD_CACHE_DIR} ${git_path} ${openocd_path} >/dev/null 2>&1
+          \git clone -b v${openocd_version} --reference ${OPENOCD_CACHE_DIR} ${git_path} ${openocd_path} >/dev/null 2>&1
         else
-          \git clone -b ${openocd_version} ${git_path} ${openocd_path} >/dev/null 2>&1
+          \git clone -b v${openocd_version} ${git_path} ${openocd_path} >/dev/null 2>&1
         fi
         if [ $? -ne 0 ]; then
           is_err=1
@@ -380,14 +380,14 @@ while IFS='' read -r line || [[ -n $line ]]; do
         state "Loading OpenOCD source"
         \mkdir -p ${openocd_path} >/dev/null 2>&1
         \pushd ${openocd_path} >/dev/null 2>&1
-        \wget ${archive_path}/archive/${openocd_version}.tar.gz >/dev/null 2>&1
+        \wget ${archive_path}/archive/v${openocd_version}.tar.gz >/dev/null 2>&1
         if [ $? -ne 0 ]; then
           is_err=1
-          error_str="Not possible to load ${archive_path}/archive/${openocd_version}.tar.gz"
+          error_str="Not possible to load ${archive_path}/archive/v${openocd_version}.tar.gz"
           \rm -rf ${openocd_path}
         fi
         archive_dir=($(basename ${archive_path}))
-        \tar zxf ${openocd_version}.tar.gz --strip=1 ${archive_dir}-${openocd_version} >/dev/null 2>&1
+        \tar zxf v${openocd_version}.tar.gz --strip=1 ${archive_dir}-${openocd_version} >/dev/null 2>&1
         \rm -f ${openocd_version}.tar.gz >/dev/null 2>&1
         \git init >/dev/null 2>&1
         \git commit --allow-empty -m "Initial commit" >/dev/null 2>&1
@@ -432,6 +432,11 @@ done < ${OPENOCD_CONFIG_PATH}
 if [[ ${msg_patch} == 1 ]]; then
   \popd >/dev/null 2>&1
 fi
+
+\pushd ${openocd_path} >/dev/null 2>&1
+\git submodule init
+\git submodule update
+\popd >/dev/null 2>&1
 
 echo "OPENOCD LOADED" >> ${OPENOCD_CONFIG_STATUS_PATH}
 clear_line

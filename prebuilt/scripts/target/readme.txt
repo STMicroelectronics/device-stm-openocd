@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 Prerequisites:
 The users of OpenOCD as well as computer programs interacting with OpenOCD are expecting that certain commands
 do the same thing across all the targets.
@@ -38,4 +40,3 @@ Note that a target/xxx.cfg file can invoke another target/yyy.cfg file,
 so one can create target subtype configurations where e.g. only
 amount of DRAM, oscillator speeds differ and having a single
 config file for the default/common settings.
-
