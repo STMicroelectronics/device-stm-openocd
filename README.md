@@ -3,40 +3,40 @@
 This module is used to provide
 * prebuilt OpenOCD executable for STM32MP2
 * scripts for OpenOCD configuration for STM32MP2
-* scripts to load and build Linux kernel source for STM32MP2
+* scripts to load and build OpenOCD source for STM32MP2
 
 It is part of the STMicroelectronics delivery for Android.
 
 ## Description ##
 
-This module version is the updated version for STM32MP25 OpenSTDroid V5.0
+This module targets STM32MP25 in OpenSTDroid v6.2.0.
 Please see the release notes for more details.
 
 ## Documentation ##
 
 * The [release notes][] provide information on the release.
-[release notes]: https://wiki.st.com/stm32mpu-ecosystem-v5/wiki/STM32_MPU_OpenSTDroid_release_note_-_v5.1.0
+[release notes]: https://wiki.st.com/stm32mpu/wiki/STM32_MPU_OpenSTDroid_release_note_-_v6.2.0
 
 ## Dependencies ##
 
-This module can't be used alone. It is part of the STMicroelectronics delivery for Android.
+This module cannot be used alone. It is part of the STMicroelectronics delivery for Android.
 
-## Containing ##
+## Contents ##
 
 This module contains several files and directories.
 
-**prebuilt**
+**Prebuilt**
 * `./prebuilt/openocd`: prebuilt executable of OpenOCD
 * `./prebuilt/scripts/*`: configuration scripts for OpenOCD including ST-link
 
-**source**
-* `./source/load_openocd.sh`: script used to load OpenOCD source with required patches for STM32MP1
+**Source**
+* `./source/load_openocd.sh`: script used to load OpenOCD source with required patches for STM32MP2
 * `./source/build_openocd.sh`: script used to generate/update prebuilt images
 * `./source/android_openocdbuild.config`: configuration file used by the build_openocd.sh script
-* `./source/patch/*`: OpenOCD patches required (not yet up-streamed)
+* `./source/patch/*`: OpenOCD patches required (not yet upstreamed)
 
 **stm32wrapper4dbg**
-* A tool that adds a debug wrapper to a stm32 fsbl image (see details in associated [README.md](./stm32wrapper4dbg/README.md)).
+* A tool that adds a debug wrapper to a STM32 fsbl image (see details in associated [README.md](./stm32wrapper4dbg/README.md)).
 
 ## License ##
 
